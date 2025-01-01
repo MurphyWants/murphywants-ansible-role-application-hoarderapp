@@ -1,0 +1,55 @@
+services:
+  web:
+    image: ghcr.io/hoarder-app/hoarder:{{ HORDERAPP_CONTAINER_VERSION }}
+    restart: unless-stopped
+    container_name: hoarderapp_web
+    volumes:
+      -  "{{ HORDERAPP_PATH }}/volumes/hoarderapp-data:/data"
+    ports:
+      - 127.0.0.1:{{ HORDERAPP_HTTP_PORT }}:3000/tcp
+    #env_file:
+    #  - .env
+    environment:
+      - MEILI_ADDR=http://meilisearch:7700
+      - BROWSER_WEB_URL=http://chrome:9222
+      - DATA_DIR=/data
+      - NEXTAUTH_SECRET="{{ HORDERAPP_ENV_NEXTAUTH_SECRET }}"
+      - MELI_MASTER_KEY="{{ HORDERAPP_ENV_MEILI_MASTER_KEY }}"
+      - HOARDER_VERSION=release
+      - NEXAUTH_URL={{ HORDERAPP_FQDN }}
+    networks:
+      - net_hoarderapp
+  chrome:
+    container_name: hoarderapp_scraper
+    image: gcr.io/zenika-hub/alpine-chrome:123
+    restart: unless-stopped
+    command:
+      --no-sandbox
+      --disable-gpu
+      --disable-dev-shm-usage
+      --remote-debugging-address=0.0.0.0
+      --remote-debugging-port=9222
+      --hide-scrollbars
+    networks:
+      - net_hoarderapp
+  meilisearch:
+    container_name: hoarderapp_search
+    image: getmeili/meilisearch:v1.11.1
+    restart: unless-stopped
+    environment:
+      - MEILI_NO_ANALYTICS="true"
+      - NEXTAUTH_SECRET="{{ HORDERAPP_ENV_NEXTAUTH_SECRET }}"
+      - MELI_MASTER_KEY="{{ HORDERAPP_ENV_MEILI_MASTER_KEY }}"
+      - HOARDER_VERSION=release
+      - NEXAUTH_URL={{ HORDERAPP_FQDN }}
+    volumes:
+      - "{{ HORDERAPP_PATH }}/volumes/meilisearch-data:/meili_data"
+    networks:
+      - net_hoarderapp
+networks:
+  net_hoarderapp:
+    external: false
+    driver: bridge
+    ipam:
+      driver: default
+    name: net_hoarderapp

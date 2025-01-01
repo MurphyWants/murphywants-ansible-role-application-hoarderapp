@@ -1,0 +1,33 @@
+---
+  - name: Create folders
+    ansible.builtin.file:
+      path: "{{ item }}"
+      state: directory
+    loop:
+      - "{{ HORDERAPP_PATH }}"
+      - "{{ HORDERAPP_PATH }}/volumes"
+      - "{{ HORDERAPP_PATH }}/volumes/hoarderapp-data"
+      - "{{ HORDERAPP_PATH }}/volumes/meilisearch-data"
+      - "{{ HORDERAPP_PATH }}/backups"
+      - "{{ HORDERAPP_PATH }}/backups/database"
+      - "{{ HORDERAPP_PATH }}/backups/tarballs"
+      - "{{ HORDERAPP_PATH }}/backups/logs"
+      - "{{ HORDERAPP_PATH }}/scripts"
+      - "{{ HORDERAPP_PATH }}/docs"
+
+
+  - name: Copy docker compose file
+    ansible.builtin.template:
+      src: "{{ role_path }}/templates/HORDERAPP_docker-compose.yml.j2"
+      dest: "{{ HORDERAPP_PATH }}/docs/docker-compose.yml"
+
+  - name: Install nginx
+    ansible.builtin.package:
+      name: nginx
+      state: 'latest'
+
+  - name: Install sqlite3
+    ansible.builtin.package:
+      name: sqlite3
+
+

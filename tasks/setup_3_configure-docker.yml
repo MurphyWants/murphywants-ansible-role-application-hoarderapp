@@ -1,0 +1,7 @@
+---
+  - name: Start hoarderapp
+    community.docker.docker_compose_v2:
+      project_src: "{{ HORDERAPP_PATH }}/docs"
+      files: "docker-compose.yml"
+      pull: always
+
