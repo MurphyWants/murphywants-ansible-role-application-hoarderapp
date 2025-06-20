@@ -34,7 +34,7 @@ services:
       - net_hoarderapp
   meilisearch:
     container_name: hoarderapp_search
-    image: getmeili/meilisearch:v1.11.1
+    image: getmeili/meilisearch:{{ HORDERAPP_MEILISEARCH_CONTAINER_VERSION }}
     restart: unless-stopped
     environment:
       - MEILI_NO_ANALYTICS="true"
